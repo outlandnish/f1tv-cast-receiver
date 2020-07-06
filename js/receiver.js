@@ -12,7 +12,7 @@ playerManager.setMessageInterceptor(
     cookie = request.customData
     document.cookie = cookie
     // const tokenQueryString = cookie.substring(cookie.indexOf('lvlt_tk_q='), )
-    request.url += 
+    // request.url += 
     return request;
   });
   
