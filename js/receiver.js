@@ -1,18 +1,35 @@
 const context = cast.framework.CastReceiverContext.getInstance();
 const playerManager = context.getPlayerManager();
 const castOptions = new cast.framework.CastReceiverOptions();
+let isLive = false
 let playbackConfig = (Object.assign(new cast.framework.PlaybackConfig(), playerManager.getPlaybackConfig()));
 
 playerManager.setMessageInterceptor(
   cast.framework.messages.MessageType.LOAD,
   request => {
-    console.log('loaded', request)
-
     request.media.hlsSegmentFormat = cast.framework.messages.HlsSegmentFormat.TS
+    isLive = request.media.streamType === cast.framework.messages.StreamType.LIVE
+
+    // disable seeking for now on live videos (need to test if seeking is supported)
+    if (isLive)
+      playerManager.removeSupportedMediaCommands(cast.framework.messages.Command.SEEK, true)
+
     setCookies(request.media.customData)
 
     return request;
-  });
+  }
+);
+
+playerManager.setMessageInterceptor(
+  cast.framework.messages.MessageType.SEEK,
+  seekData => {
+      // if the SEEK supported media command is disabled, block seeking
+      if (isLive && !(playerManager.getSupportedMediaCommands() & cast.framework.messages.Command.SEEK)) {
+          return null;
+      }
+
+      return seekData;
+})
   
 playbackConfig.manifestRequestHandler = requestInfo => {
   requestInfo.withCredentials = true
@@ -53,7 +70,6 @@ context.start(castOptions)
 function setCookies(cookie) {
   let cookies = cookie.split(';')
   for (let part of cookies) {
-    console.log('setting cookie', part)
     document.cookie = part
   }
 }
