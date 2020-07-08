@@ -1,8 +1,12 @@
-const context = cast.framework.CastReceiverContext.getInstance();
-const playerManager = context.getPlayerManager();
-const castOptions = new cast.framework.CastReceiverOptions();
+const context = cast.framework.CastReceiverContext.getInstance()
+const playerManager = context.getPlayerManager()
+const castOptions = new cast.framework.CastReceiverOptions()
+
+const playerData = new cast.framework.ui.PlayerData()
+const playerDataBinder = new cast.framework.ui.PlayerDataBinder(playerData)
+
 let isLive = false
-let playbackConfig = (Object.assign(new cast.framework.PlaybackConfig(), playerManager.getPlaybackConfig()));
+let playbackConfig = (Object.assign(new cast.framework.PlaybackConfig(), playerManager.getPlaybackConfig()))
 
 playerManager.setMessageInterceptor(
   cast.framework.messages.MessageType.LOAD,
@@ -14,6 +18,7 @@ playerManager.setMessageInterceptor(
     if (isLive)
       playerManager.removeSupportedMediaCommands(cast.framework.messages.Command.SEEK, true)
 
+    // sets auth cookies that need to be sent with each segment request
     setCookies(request.media.customData)
 
     return request;
@@ -23,12 +28,11 @@ playerManager.setMessageInterceptor(
 playerManager.setMessageInterceptor(
   cast.framework.messages.MessageType.SEEK,
   seekData => {
-      // if the SEEK supported media command is disabled, block seeking
-      if (isLive && !(playerManager.getSupportedMediaCommands() & cast.framework.messages.Command.SEEK)) {
-          return null;
-      }
+    // if the SEEK supported media command is disabled, block seeking
+    if (isLive && !(playerManager.getSupportedMediaCommands() & cast.framework.messages.Command.SEEK))
+      return null
 
-      return seekData;
+    return seekData;
 })
   
 playbackConfig.manifestRequestHandler = requestInfo => {
@@ -65,6 +69,39 @@ playbackConfig.licenseRequestHandler = requestInfo => {
 }
 
 castOptions.playbackConfig = playbackConfig;
+
+const touchControls = cast.framework.ui.Controls.getInstance()
+
+playerDataBinder.addEventListener(
+  cast.framework.ui.PlayerDataEventType.MEDIA_CHANGED,
+  (e) => {
+    if (!e.value) return;
+
+    // clear default buttons and re-assign
+    touchControls.clearDefaultSlotAssignments()
+
+    touchControls.assignButton(
+      cast.framework.ui.ControlsSlot.SLOT_SECONDARY_1,
+      cast.framework.ui.ControlsButton.CAPTIONS
+    )
+
+    touchControls.assignButton(
+      cast.framework.ui.ControlsSlot.SLOT_SECONADRY_2,
+      cast.framework.ui.ControlsButton.NONE
+    )
+
+    touchControls.assignButton(
+      cast.framework.ui.ControlsSlot.SLOT_PRIMARY_1,
+      cast.framework.ui.ControlsButton.SEEK_BACKWARD_30
+    )
+
+    touchControls.assignButton(
+      cast.framework.ui.ControlsSlot.SLOT_PRIMARY_2,
+      cast.framework.ui.ControlsButton.SEEK_FORWARD_30
+    )
+  }
+)
+
 context.start(castOptions)
 
 function setCookies(cookie) {
