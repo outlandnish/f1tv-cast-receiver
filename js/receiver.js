@@ -15,6 +15,7 @@ playerManager.setMessageInterceptor(
     isLive = request.media.streamType === cast.framework.messages.StreamType.LIVE
 
     // disable seeking for now on live videos (need to test if seeking is supported)
+    playerManager.setSupportedMediaCommands(cast.framework.messages.Command.ALL_BASIC_MEDIA)
     if (isLive)
       playerManager.removeSupportedMediaCommands(cast.framework.messages.Command.SEEK, true)
 
@@ -102,6 +103,7 @@ playerDataBinder.addEventListener(
   }
 )
 
+castOptions.supportedCommands = cast.framework.messages.Command.ALL_BASIC_MEDIA
 context.start(castOptions)
 
 function setCookies(cookie) {
