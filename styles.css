@@ -1,0 +1,31 @@
+@font-face {
+  font-family: "formula-1";
+  src: url("fonts/formula-1-text-regular.woff") format('woff');
+}
+
+@font-face {
+  font-family: "formula-1";
+  src: url("fonts/formula-1-display-bold_web.woff") format('woff');
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: "titillium-web";
+  src: url("fonts/titillium-web-regular.woff") format('woff');
+}
+
+
+@font-face {
+  font-family: "titillium-web";
+  src: url("fonts/titillium-web-bold.woff") format('woff');
+  font-weight: bold;
+}
+
+html {
+  font-family: 'formula-1', 'sans-serif'
+}
+
+h1 {
+  font-family: 'formula-1', 'sans-serif';
+  font-weight: bold;
+}
