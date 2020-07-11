@@ -14,27 +14,12 @@ playerManager.setMessageInterceptor(
     request.media.hlsSegmentFormat = cast.framework.messages.HlsSegmentFormat.TS
     isLive = request.media.streamType === cast.framework.messages.StreamType.LIVE
 
-    // disable seeking for now on live videos (need to test if seeking is supported)
-    playerManager.setSupportedMediaCommands(cast.framework.messages.Command.ALL_BASIC_MEDIA)
-    if (isLive)
-      playerManager.removeSupportedMediaCommands(cast.framework.messages.Command.SEEK, true)
-
     // sets auth cookies that need to be sent with each segment request
     setCookies(request.media.customData)
 
     return request;
   }
 );
-
-playerManager.setMessageInterceptor(
-  cast.framework.messages.MessageType.SEEK,
-  seekData => {
-    // if the SEEK supported media command is disabled, block seeking
-    if (isLive && !(playerManager.getSupportedMediaCommands() & cast.framework.messages.Command.SEEK))
-      return null
-
-    return seekData;
-})
   
 playbackConfig.manifestRequestHandler = requestInfo => {
   requestInfo.withCredentials = true
