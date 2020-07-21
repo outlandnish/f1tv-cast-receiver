@@ -2,8 +2,11 @@
 
 A custom Google Cast receiver to work with authenticated F1 TV streams. Supports language and closed caption tracks.
 
-[Work in Progress]
+### Work in Progress
 * Branding / styling needs to be done
+
+### Known Issues
+* Older F1 race streams do not Cast because of a stricter CORS policy for webpage origin. Possible workaround is proxy HLS calls using Lambda functions on Netlify.
 
 ## Contributions
 
